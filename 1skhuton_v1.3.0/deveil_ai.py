@@ -68,7 +68,7 @@ class AIInvalidJSONError(DeveilAIError):
 
 @dataclass
 class AIConfig:
-    model: str = os.getenv("DEVEIL_MODEL", "gemini-2.5-flash")
+    model: str = os.getenv("DEVEIL_MODEL", "gemini-3.8-flash")
     temperature: float = float(os.getenv("DEVEIL_TEMPERATURE", "0.2"))
     question_max_output_tokens: int = int(os.getenv("DEVEIL_QUESTION_MAX_OUTPUT_TOKENS", "1800"))
     comparison_max_output_tokens: int = int(os.getenv("DEVEIL_COMPARISON_MAX_OUTPUT_TOKENS", "2500"))

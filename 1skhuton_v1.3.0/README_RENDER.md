@@ -128,7 +128,7 @@ API 키나 기준 답변이 사용자 응답에 포함되지 않도록 공개/�
 
 기본값:
 - 제공사: Google Gemini
-- 모델: `gemini-2.5-flash`
+- 모델: `gemini-3.8-flash`
 - Temperature: `0.2`
 - 최대 출력 토큰: 질문 1800 / 비교 2500 / 학습 1500
 - 출력: `application/json` + JSON response schema
