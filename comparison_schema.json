@@ -1,0 +1,185 @@
+{
+  "output_structure": {
+    "common": [
+      {
+        "title": "...",
+        "user_quote": "...",
+        "ai_view": "...",
+        "reason": "..."
+      }
+    ],
+    "supplement": [
+      {
+        "title": "...",
+        "user_quote": "실제 인용 또는 빈 문자열",
+        "ai_view": "...",
+        "reason": "..."
+      }
+    ],
+    "unique": [
+      {
+        "title": "...",
+        "user_quote": "...",
+        "reason": "..."
+      }
+    ],
+    "error": [
+      {
+        "title": "...",
+        "user_quote": "...",
+        "conflict": "...",
+        "how_to_check": "..."
+      }
+    ],
+    "judgment_hold": [
+      {
+        "title": "...",
+        "user_quote": "실제 인용 또는 빈 문자열",
+        "reason": "...",
+        "follow_up_question": "..."
+      }
+    ]
+  },
+  "response_schema": {
+    "type": "OBJECT",
+    "required": [
+      "common",
+      "supplement",
+      "unique",
+      "error",
+      "judgment_hold"
+    ],
+    "properties": {
+      "common": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "required": [
+            "title",
+            "user_quote",
+            "ai_view",
+            "reason"
+          ],
+          "properties": {
+            "title": {
+              "type": "STRING"
+            },
+            "user_quote": {
+              "type": "STRING"
+            },
+            "ai_view": {
+              "type": "STRING"
+            },
+            "reason": {
+              "type": "STRING"
+            }
+          }
+        }
+      },
+      "supplement": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "required": [
+            "title",
+            "user_quote",
+            "ai_view",
+            "reason"
+          ],
+          "properties": {
+            "title": {
+              "type": "STRING"
+            },
+            "user_quote": {
+              "type": "STRING",
+              "minLength": 0,
+              "description": "사용자 발언을 직접 인용할 수 없으면 빈 문자열 허용"
+            },
+            "ai_view": {
+              "type": "STRING"
+            },
+            "reason": {
+              "type": "STRING"
+            }
+          }
+        }
+      },
+      "unique": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "required": [
+            "title",
+            "user_quote",
+            "reason"
+          ],
+          "properties": {
+            "title": {
+              "type": "STRING"
+            },
+            "user_quote": {
+              "type": "STRING"
+            },
+            "reason": {
+              "type": "STRING"
+            }
+          }
+        }
+      },
+      "error": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "required": [
+            "title",
+            "user_quote",
+            "conflict",
+            "how_to_check"
+          ],
+          "properties": {
+            "title": {
+              "type": "STRING"
+            },
+            "user_quote": {
+              "type": "STRING"
+            },
+            "conflict": {
+              "type": "STRING"
+            },
+            "how_to_check": {
+              "type": "STRING"
+            }
+          }
+        }
+      },
+      "judgment_hold": {
+        "type": "ARRAY",
+        "items": {
+          "type": "OBJECT",
+          "required": [
+            "title",
+            "user_quote",
+            "reason",
+            "follow_up_question"
+          ],
+          "properties": {
+            "title": {
+              "type": "STRING"
+            },
+            "user_quote": {
+              "type": "STRING",
+              "minLength": 0,
+              "description": "사용자 발언을 직접 인용할 수 없으면 빈 문자열 허용"
+            },
+            "reason": {
+              "type": "STRING"
+            },
+            "follow_up_question": {
+              "type": "STRING"
+            }
+          }
+        }
+      }
+    }
+  }
+}
