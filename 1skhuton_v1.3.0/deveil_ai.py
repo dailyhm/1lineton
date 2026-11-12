@@ -172,9 +172,9 @@ def _required_string(data: dict[str, Any], key: str) -> str:
 
 
 def validate_question_result(data: dict[str, Any]) -> dict[str, Any]:
-    expected = {"chat_title", "chat_summary", "choices", "guidance", "reference_answer"}
+    expected = {"chat_title", "chat_summary", "choices", "hints", "guidance", "reference_answer"}
     if set(data) != expected:
-        raise AIOutputError("질문 생성 JSON은 chat_title, chat_summary, choices, guidance, reference_answer만 포함해야 합니다.")
+        raise AIOutputError("질문 생성 JSON은 chat_title, chat_summary, choices, hints, guidance, reference_answer만 포함해야 합니다.")
 
     chat_title = _required_string(data, "chat_title")
     chat_summary = _required_string(data, "chat_summary")
@@ -186,6 +186,11 @@ def validate_question_result(data: dict[str, Any]) -> dict[str, Any]:
     choices = data["choices"]
     if not isinstance(choices, list) or len(choices) != 3 or not all(isinstance(x, str) and x.strip() for x in choices):
         raise AIOutputError("choices는 비어 있지 않은 문자열 3개 배열이어야 합니다.")
+
+    hints = data["hints"]
+    if not isinstance(hints, list) or len(hints) != 2 or not all(isinstance(x, str) and x.strip() for x in hints):
+        raise AIOutputError("hints는 비어 있지 않은 문자열 2개 배열이어야 합니다.")
+    clean_hints = [x.strip() for x in hints]
 
     guidance = data["guidance"]
     if not isinstance(guidance, list) or len(guidance) != 2:
@@ -208,6 +213,7 @@ def validate_question_result(data: dict[str, Any]) -> dict[str, Any]:
         "chat_title": chat_title,
         "chat_summary": chat_summary,
         "choices": [x.strip() for x in choices],
+        "hints": clean_hints,
         "guidance": clean_guidance,
         "reference_answer": _required_string(data, "reference_answer"),
     }
@@ -396,7 +402,7 @@ class DeveilAIService:
                 "chat_summary": result["chat_summary"],
                 "choices": result["choices"],
             },
-            "private": {"reference_answer": result["reference_answer"], "guidance": result["guidance"]},
+            "private": {"reference_answer": result["reference_answer"], "hints": result["hints"], "guidance": result["guidance"]},
             "security": {"secret_was_masked": was_masked},
         }
 
@@ -410,6 +416,14 @@ class DeveilAIService:
         if not isinstance(item, dict) or set(item) != {"look_at", "try_this"}:
             raise DeveilAIError("저장된 안내 데이터의 형식이 올바르지 않습니다.")
         return {"look_at": item["look_at"], "try_this": item["try_this"], "level": str(guidance_level)}
+
+    def get_hint_text(self, private_data: dict[str, Any], hint_level: int) -> dict[str, str]:
+        if hint_level not in (1, 2):
+            raise ValueError("힌트 단계는 1 또는 2만 가능합니다.")
+        hints = private_data.get("hints", [])
+        if not isinstance(hints, list) or len(hints) != 2 or not all(isinstance(x, str) and x.strip() for x in hints):
+            raise DeveilAIError("저장된 힌트 데이터가 올바르지 않습니다.")
+        return {"hint": hints[hint_level - 1], "level": str(hint_level)}
 
     # 기존 테스트 어댑터/호출 코드와의 호환성을 위해 메서드 이름은 유지합니다.
     def get_hint(self, private_data: dict[str, Any], hint_level: int) -> dict[str, str]:
@@ -447,6 +461,7 @@ class FakeProvider:
                 "chat_title": "리스트 인덱스 오류는 왜 발생할까요?",
                 "chat_summary": "반복 범위와 리스트의 유효 인덱스 확인하기",
                 "choices": ["반복 범위를 확인한다.", "리스트 인덱스 범위를 확인한다.", "마지막 접근 값을 확인한다."],
+                "hints": ["반복문이 몇 번 실행되는지 세어 보세요.", "마지막 반복에서 사용하는 인덱스와 리스트 길이를 비교해 보세요."],
                 "guidance": [
                     {"look_at": "반복문의 종료 조건", "try_this": "range에 전달된 시작값과 끝값을 직접 적고, 실제로 몇 번 반복되는지 번호를 붙여 보세요."},
                     {"look_at": "리스트의 유효 인덱스", "try_this": "len(items)와 len(items)-1을 비교한 다음, 마지막 반복에서 접근하는 인덱스가 범위 안에 있는지 확인해 보세요."},
@@ -485,7 +500,7 @@ def run_self_test() -> None:
     assert "인덱스 오류" in prepared["public"]["chat_title"]
     assert prepared["public"]["chat_summary"]
     assert len(prepared["public"]["choices"]) == 3
-    assert set(prepared["private"]) == {"reference_answer", "guidance"}
+    assert set(prepared["private"]) == {"reference_answer", "hints", "guidance"}
     assert len(prepared["private"]["guidance"]) == 2
     assert "reference_answer" not in json.dumps(prepared["public"], ensure_ascii=False)
     assert "guidance" not in json.dumps(prepared["public"], ensure_ascii=False)
@@ -495,7 +510,7 @@ def run_self_test() -> None:
         guidance = service.get_guidance(prepared["private"], level)
         assert set(guidance) == {"look_at", "try_this", "level"}
         assert guidance["look_at"] and len(guidance["try_this"]) >= 12
-    print("[통과] 살펴볼 지점 + 구체적 행동 힌트 통합 안내 2단계")
+    print("[통과] 힌트 2단계와 살펴볼 지점/행동 안내 2단계가 독립 제공됨")
 
     thought = "리스트 길이와 인덱스 범위를 비교해야 한다고 생각합니다. 반복문의 종료 조건도 확인해 볼 필요가 있습니다."
     comparison = service.compare("인덱스 오류 원인은?", "", "DEBUGGING", thought, prepared["private"]["reference_answer"])
@@ -556,6 +571,7 @@ def run_self_test() -> None:
                 "chat_title": "테스트 질문 제목",
                 "chat_summary": "실패한 응답 이후 정상 응답 생성",
                 "choices": ["관점 1", "관점 2", "관점 3"],
+                "hints": ["첫 번째 힌트", "두 번째 힌트"],
                 "guidance": [
                     {"look_at": "살펴볼 지점 1", "try_this": "첫 번째로 직접 확인할 구체적인 행동을 수행해 보세요."},
                     {"look_at": "살펴볼 지점 2", "try_this": "두 번째로 값을 바꾸어 결과 차이를 직접 비교해 보세요."},
@@ -584,7 +600,7 @@ def run_live_demo() -> None:
     print(json.dumps(prepared["public"], ensure_ascii=False, indent=2))
     print("[서버 내부 전용 데이터 - 공개 금지]")
     print(json.dumps(prepared["private"], ensure_ascii=False, indent=2))
-    print("살펴볼 지점 + 행동 힌트 1:", json.dumps(service.get_guidance(prepared["private"], 1), ensure_ascii=False))
+    print("살펴볼 지점 1:", json.dumps(service.get_guidance(prepared["private"], 1), ensure_ascii=False))
     thought = input("사용자의 생각을 30자 이상 입력하세요: ")
     result = service.compare(
         "반복문에서 인덱스 오류가 발생하는 이유가 뭔가요?",

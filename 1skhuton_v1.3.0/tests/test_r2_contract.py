@@ -11,6 +11,7 @@ class R2ContractTests(unittest.TestCase):
         raw = {
             "chat_title": "제목", "chat_summary": "요약",
             "choices": ["가", "나", "다"],
+            "hints": ["첫 번째 힌트입니다.", "두 번째 힌트입니다."],
             "guidance": [
                 {"look_at": "관찰 1", "try_this": "구체적인 행동을 첫 번째로 수행해 보세요."},
                 {"look_at": "관찰 2", "try_this": "두 번째 값을 바꾸어 결과를 비교해 보세요."},
@@ -20,7 +21,7 @@ class R2ContractTests(unittest.TestCase):
         cleaned = deveil_ai.validate_question_result(raw)
         self.assertEqual(len(cleaned["choices"]), 3)
         self.assertEqual(len(cleaned["guidance"]), 2)
-        self.assertNotIn("hints", cleaned)
+        self.assertEqual(len(cleaned["hints"]), 2)
         for extra in ("question_type", "example_sentence"):
             bad = dict(raw, **{extra: "not allowed"})
             with self.assertRaises(deveil_ai.AIOutputError):
@@ -81,14 +82,17 @@ class R2ContractTests(unittest.TestCase):
         self.assertIn("session_id", body)
         hint = client.post("/api/hint", json={"session_id": body["session_id"], "level": 1})
         self.assertEqual(hint.status_code, 200, hint.text)
-        self.assertEqual(set(hint.json()), {"look_at", "try_this", "level"})
+        self.assertEqual(set(hint.json()), {"hint", "level"})
         self.assertNotIn("reference_answer", json.dumps(hint.json()))
+        guidance = client.post("/api/guidance", json={"session_id": body["session_id"], "level": 1})
+        self.assertEqual(set(guidance.json()), {"look_at", "try_this", "level"})
 
     def test_r6_template_is_pending_and_has_no_fabricated_samples(self):
         template = json.loads((Path(__file__).resolve().parents[1] / "R6_input_output_samples.json").read_text(encoding="utf-8"))
         self.assertEqual(template["status"], "PENDING_LIVE_COLLECTION")
         self.assertEqual(template["samples"], [])
         self.assertIn("guidance", template["question_generation_expected_internal_fields"])
+        self.assertIn("hints", template["question_generation_expected_internal_fields"])
         self.assertIn("reference_answer", template["question_generation_expected_internal_fields"])
 
     def test_timeout_is_fixed_to_15_seconds(self):

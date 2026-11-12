@@ -196,3 +196,10 @@ Render 테스트 어댑터는 `/api/question` 호출마다 새 `chat_id`와 임�
 R6 수집 스크립트는 공개 API에서 공개 응답과 비교/학습 결과를 수집합니다. 질문 생성의 비공개 `guidance`와 `reference_answer`는 공개 API 응답에 넣지 않습니다. 해당 내부 출력의 실측 보관은 `scripts/collect_r6_internal_samples.py`를 신뢰할 수 있는 서버 환경에서 실행해 별도 제한 파일로 수집할 수 있습니다. 이 스크립트 출력은 private 데이터를 포함하므로 공개 API나 프론트엔드에 전달하지 마세요. API 키는 수집 클라이언트에 전달하지 않고 배포 서버 환경변수에만 둡니다.
 
 사용자 재시도 버튼은 운영 `analysis_job` 단위에서 최초 실행 포함 최대 3회로 제한해야 합니다. 이 AI 모듈의 JSON 자동 재시도는 호출 1회당 최대 2회 추가이며, 작업 단위 재시도와 중복해서 무제한 실행하지 않도록 백엔드가 단일 attempt 카운터를 적용해야 합니다.
+
+
+## Figma 힌트/살펴볼 지점 API
+
+- `POST /api/hint` body `{ "session_id": "...", "level": 1 }` → `{ "hint": "...", "level": "1" }`
+- `POST /api/guidance` body `{ "session_id": "...", "level": 1 }` → `{ "look_at": "...", "try_this": "...", "level": "1" }`
+- 두 API는 별도 탭에서 독립적으로 호출합니다. `/api/question` 공개 응답에는 둘 다 포함하지 않습니다.

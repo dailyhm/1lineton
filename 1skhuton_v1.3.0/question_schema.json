@@ -4,6 +4,7 @@
     "chat_title",
     "chat_summary",
     "choices",
+    "hints",
     "guidance",
     "reference_answer"
   ],
@@ -46,6 +47,14 @@
     },
     "reference_answer": {
       "type": "STRING"
+    },
+    "hints": {
+      "type": "ARRAY",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "STRING"
+      }
     }
   }
 }

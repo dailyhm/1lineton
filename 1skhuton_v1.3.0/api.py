@@ -177,12 +177,22 @@ def reveal_hint(payload: HintRequest):
     session = get_session(payload.session_id)
     if payload.level not in (1, 2):
         raise HTTPException(status_code=422, detail="안내 단계는 1 또는 2만 가능합니다.")
-    # 기존 /api/hint 경로는 유지하되 실제 반환값은 살펴볼 지점과 행동 힌트의 한 묶음입니다.
-    guidance = session["private"].get("guidance", [])
-    if len(guidance) != 2:
-        raise HTTPException(status_code=500, detail="저장된 안내 데이터가 올바르지 않습니다.")
-    item = guidance[payload.level - 1]
-    return {"look_at": item["look_at"], "try_this": item["try_this"], "level": str(payload.level)}
+    # Figma의 '힌트' 탭 전용 응답. 살펴볼 지점/해보기는 /api/guidance에서 별도 제공한다.
+    try:
+        return get_service().get_hint_text(session["private"], payload.level)
+    except DeveilAIError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/guidance", tags=["Deveil"])
+def reveal_guidance(payload: HintRequest):
+    session = get_session(payload.session_id)
+    if payload.level not in (1, 2):
+        raise HTTPException(status_code=422, detail="살펴볼 지점 단계는 1 또는 2만 가능합니다.")
+    try:
+        return get_service().get_guidance(session["private"], payload.level)
+    except DeveilAIError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.post("/api/compare", tags=["Deveil"])

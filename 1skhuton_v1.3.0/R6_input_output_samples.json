@@ -14,7 +14,8 @@
     "chat_summary",
     "choices",
     "guidance",
-    "reference_answer"
+    "reference_answer",
+    "hints"
   ],
   "comparison_empty_user_quote_allowed_in": [
     "supplement",

@@ -33,3 +33,10 @@
 ### 변경하지 않은 핵심 파일
 - `api.py`: 기존 네 엔드포인트와 snake_case 요청 계약, `chat.chat_id`/`session_id` 응답 구조, 공개/비공개 분리 동작이 이미 현재 계약과 부합하여 코드 변경하지 않음.
 - `learning_schema.json`: 기존 네 필드 구조가 R2 요구사항과 이미 일치하여 파일 내용 변경하지 않음.
+
+## Figma 화면 정합성 보완
+
+- `hints` 문자열 배열(2단계)을 `guidance`와 독립된 내부 필드로 복원했습니다.
+- `/api/hint`는 힌트 문자열만 반환하도록 변경했습니다.
+- `/api/guidance`를 추가해 `look_at`/`try_this`를 별도로 제공합니다.
+- 공개 `/api/question` 응답에는 비공개 힌트/안내/기준 답변을 계속 제외합니다.
