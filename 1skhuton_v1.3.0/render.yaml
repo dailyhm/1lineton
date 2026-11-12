@@ -10,7 +10,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: DEVEIL_MODEL
-        value: gemini-3.8-flash
+        value: gemini-3.5-flash-lite
       - key: DEVEIL_CORS_ORIGINS
         value: "*"
       - key: DEVEIL_TEMPERATURE
