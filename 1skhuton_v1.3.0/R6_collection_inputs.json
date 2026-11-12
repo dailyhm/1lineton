@@ -1,0 +1,22 @@
+{
+  "dataset_name": "R6 live sample collection inputs",
+  "version": "1.0.0",
+  "status": "INPUTS_READY_LIVE_OUTPUTS_NOT_COLLECTED",
+  "note": "두 시나리오를 실제 백엔드에 실행해 질문 생성/비교 분석/기초 설명의 실제 모델 출력 2개씩 수집합니다.",
+  "scenarios": [
+    {
+      "sample_group": "R6-DEBUG-01",
+      "question": "리스트를 반복문으로 출력할 때 마지막에서 IndexError가 발생해요. 왜 그런가요?",
+      "code": "items = ['apple', 'banana', 'cherry']\nfor i in range(len(items) + 1):\n    print(items[i])",
+      "question_type": "DEBUGGING",
+      "original_thought": "range가 리스트 길이보다 한 번 더 반복되기 때문에 마지막 인덱스에서 오류가 날 것 같습니다. 마지막 반복 때 i가 3이 되는지 출력해서 확인하고, range의 끝값을 바꾸면 해결되는지도 살펴보겠습니다."
+    },
+    {
+      "sample_group": "R6-CONCEPT-01",
+      "question": "Python에서 리스트와 튜플은 어떤 차이가 있고 언제 각각 사용하나요?",
+      "code": "numbers = [1, 2, 3]\npoint = (10, 20)\nnumbers[0] = 9",
+      "question_type": "CONCEPT",
+      "original_thought": "리스트는 값을 바꿀 수 있고 튜플은 바꿀 수 없다는 점이 가장 큰 차이라고 생각합니다. 계속 수정할 데이터라면 리스트를 쓰고 좌표처럼 고정된 값이면 튜플을 쓰면 될 것 같습니다."
+    }
+  ]
+}
