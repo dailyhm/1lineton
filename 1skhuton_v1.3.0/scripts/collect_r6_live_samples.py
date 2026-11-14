@@ -4,7 +4,8 @@ Collect REAL R6 request/response samples by calling the Deveil v1.3.0 backend.
 
 It uses the existing endpoints:
   POST /api/question
-  POST /api/hint (levels 1 and 2; deterministic server-side retrieval)
+  POST /api/hint (levels 1 and 2; separate hint tab)
+  POST /api/guidance (levels 1 and 2; look_at + try_this)
   POST /api/compare
   POST /api/basic-learning
 
@@ -39,7 +40,7 @@ def post_json(base_url: str, path: str, payload: dict, timeout: int = 15):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", required=True, help="예: https://your-service.onrender.com")
-    ap.add_argument("--inputs", default="inputs/R6_collection_inputs.json")
+    ap.add_argument("--inputs", default="R6_collection_inputs.json")
     ap.add_argument("--output", default="R6_input_output_samples.json")
     ap.add_argument("--delay", type=float, default=13.0, help="LLM endpoint 사이 대기 초. 무료 분당 한도 고려")
     ap.add_argument("--timeout", type=int, default=15)
@@ -92,7 +93,18 @@ def main():
                     "response":h_body,
                     "collected_at":datetime.now(timezone.utc).isoformat(),
                     "is_live_model_output":False,
-                    "note":"서버에 저장된 guidance를 조회한 결과이며 별도 LLM 호출이 아닙니다."
+                    "note":"별도 hints 필드를 조회한 결과입니다. 별도 LLM 호출은 아닙니다."
+                })
+                g_status,g_body=post_json(args.base_url,"/api/guidance",hint_payload,args.timeout)
+                samples.append({
+                    "sample_id":group+f"-GUIDANCE-{level}",
+                    "task":"guidance_retrieval",
+                    "request":{"level":level,"session_context_sample":group},
+                    "http_status":g_status,
+                    "response":g_body,
+                    "collected_at":datetime.now(timezone.utc).isoformat(),
+                    "is_live_model_output":False,
+                    "note":"별도 guidance 필드의 look_at 및 try_this 조회 결과입니다. 별도 LLM 호출은 아닙니다."
                 })
             compare_payload={
                 "session_id":session_id,
@@ -148,8 +160,9 @@ def main():
         "review_required":True,
         "review_notes":[
             "HTTP 200 여부와 응답 JSON 스키마를 검토하세요.",
-            "질문 생성 응답에는 공개 필드만 포함됩니다. reference_answer와 guidance는 서버 내부 private 데이터입니다.",
+            "질문 생성 응답에는 공개 필드만 포함됩니다. reference_answer는 서버 내부 private 데이터입니다. hints와 guidance는 각각 별도 endpoint에서 단계별 조회합니다.",
             "세션 ID, 개인정보, 비밀값이 응답이나 로그에 노출되지 않았는지 확인하세요.",
+            "힌트는 /api/hint, 살펴볼 지점/해보기는 /api/guidance 응답으로 분리 검수하세요.",
             "비교 분석은 question 생성 시 발급된 임시 session_id를 사용하므로 재현용으로는 원 질문/코드/유형/사용자 생각을 함께 보관합니다."
         ]
     }

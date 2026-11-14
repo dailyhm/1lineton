@@ -9,6 +9,7 @@
 - `chat_title`: 첫 질문을 대화방 제목처럼 요약(최대 50자)
 - `chat_summary`: 질문의 핵심 확인 대상을 자연스러운 짧은 구절로 요약(최대 80자)
 - `choices`: 사고 방향 선택지 3개
+- `hints`: 단계별 힌트 문자열 2개(서버 내부 보관, 단계별 제공)
 - `guidance`: 두 단계. 각 항목은 `look_at`(간단한 관찰 대상) + `try_this`(구체적인 행동 지침)
 - `reference_answer`: 서버 내부 비교 분석용 기준 답변
 
@@ -25,7 +26,15 @@
 - 기준 답변과 `guidance`는 프론트에 일괄 전달하지 않고 서버에서 보관합니다.
 
 ## R2 2차 요청 확인
-- 질문 생성은 `chat_title`, `chat_summary`, `choices` 3개, `guidance` 2개, `reference_answer`만 생성합니다. `hints`, `question_type`, `example_sentence`는 출력하지 않습니다.
-- 공개 필드는 제목·요약·선택지이며 `guidance`와 `reference_answer`는 서버 내부 데이터입니다.
+- 질문 생성은 실제 `question_schema.json` 및 `deveil_ai.py` 기준으로 `chat_title`, `chat_summary`, `choices` 3개, `hints` 2개, `guidance` 2개, `reference_answer`를 생성합니다. `question_type`, `example_sentence`는 출력하지 않습니다.
+- 공개 필드는 제목·요약·선택지이며 `hints`, `guidance`, `reference_answer`는 서버 내부 데이터입니다. `hints`와 `guidance`는 단계별 전용 API에서 제공됩니다.
 - 비교 분석의 `supplement`와 `judgment_hold`는 인용할 사용자 문장이 없으면 `user_quote`를 빈 문자열로 둘 수 있습니다.
 - 기초 학습은 기존 네 필드(`summary`, `example_code`, `observe`, `change`)를 유지합니다.
+
+## 프롬프트 품질 개선 — 2026-11-14
+- 비교 분석: 모호한 생각을 의미 단위로 분리하고, 판단 가능한 부분과 판단 보류 부분을 각각 처리하도록 보강.
+- 비교 분석: 기술적으로 타당한 대안은 기준 답변과 달라도 `unique`로 인정하고, 적용 조건·한계를 함께 설명하도록 보강.
+- 비교 분석: 검증 가능한 `error`에는 실제 실행·로그·개발자 도구 등을 이용한 확인 절차를 `how_to_check`에 작성하도록 보강.
+- 질문 생성: 힌트 1과 힌트 2의 정보 공개 단계를 분리하고, Q-D1~Q-D5 유형별 조기 정답 노출 방지 및 직접 검증 행동을 보강.
+- 기초 학습: 관찰·실습 단계에서 실행 행동, 예상 결과 및 결과의 의미를 설명하도록 보강.
+- JSON 스키마, 필드명, 필수 필드 및 API 동작은 변경하지 않았습니다.
