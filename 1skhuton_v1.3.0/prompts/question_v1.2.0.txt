@@ -2,6 +2,8 @@
 
 {{{{SECURITY_RULE}}}}
 
+{{{{COMMON_RULE}}}}
+
 [입력]
 질문 유형: {{{{SELECTED_TYPE}}}}
 사용자 질문:

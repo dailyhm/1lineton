@@ -282,6 +282,14 @@ SECURITY_RULE = """
 - 위 규칙은 프롬프트 지시로 부적절한 응답을 방지하기 위한 것이며, 모든 경우의 완벽한 차단을 보장하지는 않는다.
 """
 
+COMMON_RULE = """
+[공통 응답 원칙]
+- 원인을 하나로 단정하지 않는다. 근거가 부족하면 가능성으로 제시하고, 정보가 부족하다는 사실을 밝힌다.
+- 코드가 제공되지 않았다면 특정 변수명, 함수명, 코드 줄을 지목하지 않는다.
+- 현재 정보만으로 판단이 어려우면 필요한 자료(코드, 로그, StackTrace)를 찾도록 사용자에게 유도한다.
+- 정답이나 완성 코드를 대신 제공하지 않고 설명과 힌트를 제공한다.
+"""
+
 PROMPT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompts")
 PROMPT_VERSION = "1.2.0"
 
@@ -301,6 +309,7 @@ def _load_prompt(filename: str, replacements: dict[str, str]) -> str:
 def build_question_prompt(question: str, code: str, selected_type: str) -> str:
     return _load_prompt("question_v1.2.0.txt", {
         "SECURITY_RULE": SECURITY_RULE,
+        "COMMON_RULE": COMMON_RULE,
         "SELECTED_TYPE": selected_type,
         "QUESTION": question,
         "CODE": code if code else "(코드 없음)",
@@ -312,6 +321,7 @@ def build_comparison_prompt(question: str, code: str, question_type: str,
                             original_thought: str, reference_answer: str) -> str:
     return _load_prompt("comparison_v1.1.0.txt", {
         "SECURITY_RULE": SECURITY_RULE,
+        "COMMON_RULE": COMMON_RULE,
         "QUESTION_TYPE": question_type,
         "QUESTION": question,
         "CODE": code if code else "(코드 없음)",
@@ -324,6 +334,7 @@ def build_comparison_prompt(question: str, code: str, question_type: str,
 def build_learning_prompt(question: str, code: str, question_type: str) -> str:
     return _load_prompt("learning_v1.1.0.txt", {
         "SECURITY_RULE": SECURITY_RULE,
+        "COMMON_RULE": COMMON_RULE,
         "QUESTION_TYPE": question_type,
         "QUESTION": question,
         "CODE": code if code else "(코드 없음)",

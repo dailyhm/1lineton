@@ -2,6 +2,8 @@
 
 {{{{SECURITY_RULE}}}}
 
+{{{{COMMON_RULE}}}}
+
 [질문 유형 및 비교 관점]
 유형: {{{{QUESTION_TYPE}}}}
 - CONCEPT: 정의, 원리, 적용 조건

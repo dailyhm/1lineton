@@ -2,6 +2,8 @@
 
 {{{{SECURITY_RULE}}}}
 
+{{{{COMMON_RULE}}}}
+
 질문 유형: {{{{QUESTION_TYPE}}}}
 질문:
 <USER_QUESTION>

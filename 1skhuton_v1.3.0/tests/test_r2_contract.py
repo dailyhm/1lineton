@@ -46,6 +46,21 @@ class R2ContractTests(unittest.TestCase):
         schema_choices = deveil_ai.QUESTION_SCHEMA["properties"]["choices"]
         self.assertEqual((schema_choices["minItems"], schema_choices["maxItems"]), (1, 3))
 
+    def test_common_rule_in_all_prompts(self):
+        prompts = [
+            deveil_ai.build_question_prompt("질문", "", "CONCEPT"),
+            deveil_ai.build_comparison_prompt("질문", "", "CONCEPT", "생각" * 20, "기준"),
+            deveil_ai.build_learning_prompt("질문", "", "CONCEPT"),
+        ]
+        for prompt in prompts:
+            self.assertIn("[공통 응답 원칙]", prompt)
+            self.assertNotIn("{{{{", prompt)
+
+    def test_question_prompt_qa_rules(self):
+        prompt = deveil_ai.build_question_prompt("질문", "", "CONCEPT")
+        for needle in ("1~3개", "해법 이름", "합친다", "개발 맥락을 지어내서", "한글을 먼저 쓰고"):
+            self.assertIn(needle, prompt)
+
     def test_empty_quotes_only_allowed_for_supplement_and_hold(self):
         thought = "이 코드는 어떤 조건에서 동작하는지 아직 잘 모르겠습니다."
         result = {
