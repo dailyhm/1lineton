@@ -19,13 +19,32 @@ class R2ContractTests(unittest.TestCase):
             "reference_answer": "기준 답변"
         }
         cleaned = deveil_ai.validate_question_result(raw)
-        self.assertEqual(len(cleaned["choices"]), 3)
+        self.assertTrue(1 <= len(cleaned["choices"]) <= 3)
         self.assertEqual(len(cleaned["guidance"]), 2)
         self.assertEqual(len(cleaned["hints"]), 2)
         for extra in ("question_type", "example_sentence"):
             bad = dict(raw, **{extra: "not allowed"})
             with self.assertRaises(deveil_ai.AIOutputError):
                 deveil_ai.validate_question_result(bad)
+
+    def test_choices_accept_one_to_three_only(self):
+        base = {
+            "chat_title": "제목", "chat_summary": "요약",
+            "hints": ["첫 번째 힌트입니다.", "두 번째 힌트입니다."],
+            "guidance": [
+                {"look_at": "관찰 1", "try_this": "구체적인 행동을 첫 번째로 수행해 보세요."},
+                {"look_at": "관찰 2", "try_this": "두 번째 값을 바꾸어 결과를 비교해 보세요."},
+            ],
+            "reference_answer": "기준 답변",
+        }
+        for n in (1, 2, 3):
+            cleaned = deveil_ai.validate_question_result(dict(base, choices=[f"관점{i}" for i in range(n)]))
+            self.assertEqual(len(cleaned["choices"]), n)
+        for bad in ([], ["a", "b", "c", "d"], ["a", " "], "a"):
+            with self.assertRaises(deveil_ai.AIOutputError):
+                deveil_ai.validate_question_result(dict(base, choices=bad))
+        schema_choices = deveil_ai.QUESTION_SCHEMA["properties"]["choices"]
+        self.assertEqual((schema_choices["minItems"], schema_choices["maxItems"]), (1, 3))
 
     def test_empty_quotes_only_allowed_for_supplement_and_hold(self):
         thought = "이 코드는 어떤 조건에서 동작하는지 아직 잘 모르겠습니다."

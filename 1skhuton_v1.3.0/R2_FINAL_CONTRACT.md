@@ -6,7 +6,7 @@ LLM 내부 출력은 다음 필드만 포함한다.
 
 - `chat_title`: 문자열, 최대 50자
 - `chat_summary`: 문자열, 최대 80자
-- `choices`: 비어 있지 않은 문자열 정확히 3개
+- `choices`: 비어 있지 않은 문자열 1~3개
 - `hints`: 문자열 정확히 2개. Figma의 힌트 탭에서 단계별로 별도 제공한다.
 - `guidance`: 객체 정확히 2개. 각 객체는 `look_at`, `try_this` 문자열만 포함
 - `reference_answer`: 비어 있지 않은 문자열

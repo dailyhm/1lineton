@@ -7,7 +7,7 @@
 - 질문 입력 최대 2,000자, 코드 입력 최대 6,000자
 - 질문 유형 4개: `CONCEPT`, `DEBUGGING`, `PROBLEM_SOLVING`, `DESIGN` (자유 유형 없음)
 - 새 대화 첫 질문으로부터 사이드바용 `chat_title`과 `chat_summary` 생성
-- 질문 생성: `choices` 3개 + `guidance` 2세트 + `reference_answer` (서버 전용)
+- 질문 생성: `choices` 1~3개 + `guidance` 2세트 + `reference_answer` (서버 전용)
 - `guidance` 한 세트는 `look_at`(간결한 관찰 대상)과 `try_this`(구체적인 행동 지침)로 구성
 - 비교 분석: `common`, `supplement`, `unique`, `error`, `judgment_hold` 모두 배열이며 모든 항목에 `title`
 - 기초 학습: `summary`, `example_code`, `observe`, `change`

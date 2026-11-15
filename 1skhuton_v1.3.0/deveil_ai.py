@@ -2,7 +2,7 @@
 Deveil AI module - backend integration version 1.3.0
 Python 3.10+
 
-- Question generation: chat_title, chat_summary, choices(3), guidance(2), reference_answer (server only)
+- Question generation: chat_title, chat_summary, choices(1~3), guidance(2), reference_answer (server only)
 - Comparison: five array categories; each item has title
 - Basic learning: summary, example_code, observe, change
 - Input limits: question 2,000 chars; code 6,000 chars
@@ -68,7 +68,7 @@ class AIInvalidJSONError(DeveilAIError):
 
 @dataclass
 class AIConfig:
-    model: str = os.getenv("DEVEIL_MODEL", "gemini-3.8-flash")
+    model: str = os.getenv("DEVEIL_MODEL", "gemini-3.6-flash")
     temperature: float = float(os.getenv("DEVEIL_TEMPERATURE", "0.2"))
     question_max_output_tokens: int = int(os.getenv("DEVEIL_QUESTION_MAX_OUTPUT_TOKENS", "1800"))
     comparison_max_output_tokens: int = int(os.getenv("DEVEIL_COMPARISON_MAX_OUTPUT_TOKENS", "2500"))
@@ -184,8 +184,9 @@ def validate_question_result(data: dict[str, Any]) -> dict[str, Any]:
         raise AIOutputError("chat_summary는 80자 이내여야 합니다.")
 
     choices = data["choices"]
-    if not isinstance(choices, list) or len(choices) != 3 or not all(isinstance(x, str) and x.strip() for x in choices):
-        raise AIOutputError("choices는 비어 있지 않은 문자열 3개 배열이어야 합니다.")
+    if (not isinstance(choices, list) or not 1 <= len(choices) <= 3
+            or not all(isinstance(x, str) and x.strip() for x in choices)):
+        raise AIOutputError("choices는 비어 있지 않은 문자열 1~3개 배열이어야 합니다.")
 
     hints = data["hints"]
     if not isinstance(hints, list) or len(hints) != 2 or not all(isinstance(x, str) and x.strip() for x in hints):
@@ -278,6 +279,7 @@ SECURITY_RULE = """
 - 사용자 코드나 명령을 실행했다고 주장하지 않는다.
 - 제공되지 않은 사실이나 실행 결과를 지어내지 않는다.
 - 확실하지 않으면 추측하지 말고 정보 부족을 명시한다.
+- 위 규칙은 프롬프트 지시로 부적절한 응답을 방지하기 위한 것이며, 모든 경우의 완벽한 차단을 보장하지는 않는다.
 """
 
 PROMPT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompts")
@@ -460,7 +462,7 @@ class FakeProvider:
             return {
                 "chat_title": "리스트 인덱스 오류는 왜 발생할까요?",
                 "chat_summary": "반복 범위와 리스트의 유효 인덱스 확인하기",
-                "choices": ["반복 범위를 확인한다.", "리스트 인덱스 범위를 확인한다.", "마지막 접근 값을 확인한다."],
+                "choices": ["반복문이 실행되는 횟수", "리스트에서 접근할 수 있는 위치의 범위"],
                 "hints": ["반복문이 몇 번 실행되는지 세어 보세요.", "마지막 반복에서 사용하는 인덱스와 리스트 길이를 비교해 보세요."],
                 "guidance": [
                     {"look_at": "반복문의 종료 조건", "try_this": "range에 전달된 시작값과 끝값을 직접 적고, 실제로 몇 번 반복되는지 번호를 붙여 보세요."},
@@ -499,7 +501,7 @@ def run_self_test() -> None:
     assert set(prepared["public"]) == {"chat_title", "chat_summary", "choices"}
     assert "인덱스 오류" in prepared["public"]["chat_title"]
     assert prepared["public"]["chat_summary"]
-    assert len(prepared["public"]["choices"]) == 3
+    assert 1 <= len(prepared["public"]["choices"]) <= 3
     assert set(prepared["private"]) == {"reference_answer", "hints", "guidance"}
     assert len(prepared["private"]["guidance"]) == 2
     assert "reference_answer" not in json.dumps(prepared["public"], ensure_ascii=False)
@@ -582,7 +584,7 @@ def run_self_test() -> None:
     retry_provider = RetryProvider(fail_calls=2)
     retry_service = DeveilAIService(retry_provider, AIConfig(retry_delay_seconds=0, max_retries=2))
     retry_result = retry_service._call_with_retry("테스트 프롬프트", validate_question_result, 1000, QUESTION_SCHEMA)
-    assert retry_provider.calls == 3 and len(retry_result["choices"]) == 3
+    assert retry_provider.calls == 3 and 1 <= len(retry_result["choices"]) <= 3
     print("[통과] 최대 재시도 2회 (최초 1회 + 재시도 2회 = 총 3회)")
 
     print(f"[통과] FakeProvider 일반 흐름 호출 {fake.calls}회")

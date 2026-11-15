@@ -1,0 +1,23 @@
+{
+  "type": "OBJECT",
+  "required": [
+    "summary",
+    "example_code",
+    "observe",
+    "change"
+  ],
+  "properties": {
+    "summary": {
+      "type": "STRING"
+    },
+    "example_code": {
+      "type": "STRING"
+    },
+    "observe": {
+      "type": "STRING"
+    },
+    "change": {
+      "type": "STRING"
+    }
+  }
+}

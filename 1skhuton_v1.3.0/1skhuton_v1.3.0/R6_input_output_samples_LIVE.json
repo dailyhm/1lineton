@@ -1,0 +1,86 @@
+{
+  "dataset_name": "Deveil R6 Input Output Samples",
+  "version": "1.0.0",
+  "status": "PARTIAL_OR_FAILED_COLLECTION",
+  "source": "Collected from deployed Deveil backend endpoints",
+  "backend_base_url": "https://onelineton.onrender.com",
+  "created_at": "2026-11-12T05:37:21.074729+00:00",
+  "successful_live_sample_counts": {
+    "basic_learning": 1
+  },
+  "samples": [
+    {
+      "sample_id": "R6-DEBUG-01-QUESTION",
+      "task": "question_generation",
+      "request": {
+        "question": "리스트를 반복문으로 출력할 때 마지막에서 IndexError가 발생해요. 왜 그런가요?",
+        "code": "items = ['apple', 'banana', 'cherry']\nfor i in range(len(items) + 1):\n    print(items[i])",
+        "selected_type": "DEBUGGING"
+      },
+      "http_status": 0,
+      "response": {
+        "collector_error": "The read operation timed out"
+      },
+      "collected_at": "2026-11-12T05:36:06.890353+00:00",
+      "is_live_model_output": false
+    },
+    {
+      "sample_id": "R6-DEBUG-01-LEARNING",
+      "task": "basic_learning",
+      "request": {
+        "question": "리스트를 반복문으로 출력할 때 마지막에서 IndexError가 발생해요. 왜 그런가요?",
+        "code": "items = ['apple', 'banana', 'cherry']\nfor i in range(len(items) + 1):\n    print(items[i])",
+        "question_type": "DEBUGGING"
+      },
+      "http_status": 0,
+      "response": {
+        "collector_error": "The read operation timed out"
+      },
+      "collected_at": "2026-11-12T05:36:35.022493+00:00",
+      "is_live_model_output": false
+    },
+    {
+      "sample_id": "R6-CONCEPT-01-QUESTION",
+      "task": "question_generation",
+      "request": {
+        "question": "Python에서 리스트와 튜플은 어떤 차이가 있고 언제 각각 사용하나요?",
+        "code": "numbers = [1, 2, 3]\npoint = (10, 20)\nnumbers[0] = 9",
+        "selected_type": "CONCEPT"
+      },
+      "http_status": 0,
+      "response": {
+        "collector_error": "The read operation timed out"
+      },
+      "collected_at": "2026-11-12T05:37:03.209492+00:00",
+      "is_live_model_output": false
+    },
+    {
+      "sample_id": "R6-CONCEPT-01-LEARNING",
+      "task": "basic_learning",
+      "request": {
+        "question": "Python에서 리스트와 튜플은 어떤 차이가 있고 언제 각각 사용하나요?",
+        "code": "numbers = [1, 2, 3]\npoint = (10, 20)\nnumbers[0] = 9",
+        "question_type": "CONCEPT"
+      },
+      "http_status": 200,
+      "response": {
+        "learning": {
+          "summary": "파이썬에서 리스트(List)와 튜플(Tuple)은 여러 값을 순서대로 담는 자료형입니다. 가장 큰 차이는 리스트는 한 번 만들고 나서 그 안에 있는 값을 바꾸거나 추가, 삭제할 수 있지만(변경 가능), 튜플은 한 번 만들면 그 안에 있는 값을 바꿀 수 없다는 점입니다(변경 불가능). 리스트는 항목이 자주 바뀌는 동적인 데이터에, 튜플은 변하지 않아야 하는 고정된 데이터에 주로 사용됩니다.",
+          "example_code": "my_list = [1, 2, 3]\nmy_tuple = (10, 20, 30)\n\nprint(f\"원래 리스트: {my_list}\")\nmy_list[0] = 5\nprint(f\"변경된 리스트: {my_list}\")\n\nprint(f\"원래 튜플: {my_tuple}\")\n# 아래 줄은 오류를 발생시킵니다.\n# my_tuple[0] = 50\n# print(f\"변경된 튜플: {my_tuple}\")",
+          "observe": "위 코드를 실행하면, `my_list`의 첫 번째 값은 1에서 5로 성공적으로 바뀐 것을 볼 수 있습니다. 하지만 `my_tuple[0] = 50` 줄의 주석을 풀고 실행하면, 튜플의 값을 바꾸려고 했기 때문에 'TypeError: 'tuple' object does not support item assignment'와 같은 오류 메시지가 나타날 것입니다. 이는 튜플이 변경 불가능하다는 것을 보여줍니다.",
+          "change": "예시 코드에서 `my_list`에 `my_list.append(4)`를 추가하여 리스트에 새 값을 넣어보세요. 그리고 `my_list.pop()`을 사용하여 마지막 값을 제거해 보세요. 튜플은 값을 바꿀 수 없으므로, 만약 튜플의 내용을 바꾸고 싶다면 `my_new_tuple = (my_tuple[0], 50, my_tuple[2])`처럼 아예 새로운 튜플을 만들어야 합니다. 이 코드를 추가하여 새로운 튜플이 어떻게 만들어지는지 확인해 보세요."
+        }
+      },
+      "collected_at": "2026-11-12T05:37:21.074529+00:00",
+      "is_live_model_output": true
+    }
+  ],
+  "review_required": true,
+  "review_notes": [
+    "HTTP 200 여부와 응답 JSON 스키마를 검토하세요.",
+    "질문 생성 응답에는 공개 필드만 포함됩니다. reference_answer는 서버 내부 private 데이터입니다. hints와 guidance는 각각 별도 endpoint에서 단계별 조회합니다.",
+    "세션 ID, 개인정보, 비밀값이 응답이나 로그에 노출되지 않았는지 확인하세요.",
+    "힌트는 /api/hint, 살펴볼 지점/해보기는 /api/guidance 응답으로 분리 검수하세요.",
+    "비교 분석은 question 생성 시 발급된 임시 session_id를 사용하므로 재현용으로는 원 질문/코드/유형/사용자 생각을 함께 보관합니다."
+  ]
+}

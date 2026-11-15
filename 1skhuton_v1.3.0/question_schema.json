@@ -19,7 +19,7 @@
     },
     "choices": {
       "type": "ARRAY",
-      "minItems": 3,
+      "minItems": 1,
       "maxItems": 3,
       "items": {
         "type": "STRING"
