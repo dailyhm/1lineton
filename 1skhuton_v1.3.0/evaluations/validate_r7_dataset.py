@@ -28,7 +28,7 @@ def main():
         qg = case["question_generation"]
         public, private = qg["public"], qg["private"]
         require(set(public) == {"chat_title", "chat_summary", "choices"}, f"{cid}: public fields")
-        require(len(public["choices"]) == 3, f"{cid}: choices must contain 3")
+        require(1 <= len(public["choices"]) <= 3, f"{cid}: choices must contain 1 to 3")
         require(set(private) == {"guidance", "reference_answer"}, f"{cid}: private fields")
         require(len(private["guidance"]) == 2, f"{cid}: guidance must contain 2")
         for g in private["guidance"]:

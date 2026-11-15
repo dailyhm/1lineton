@@ -12,7 +12,7 @@
 | 기존 비교 평가 데이터 | PASS | `evaluations/validate_dataset.py` — 6 cases |
 | R7 데모 데이터 | PASS | `evaluations/validate_r7_dataset.py` — 3 cases |
 | JSON 파싱 | PASS | 프로젝트 JSON 7개 모두 파싱 성공 |
-| question choices/guidance 개수 | PASS | 정확히 3개 / 2개 검사 |
+| question choices/guidance 개수 | PASS | choices 1~3개 / guidance 정확히 2개 검사 |
 | 빈 user_quote 허용 | PASS | supplement, judgment_hold만 빈 문자열 허용 |
 | 자동 재시도 총 횟수 | PASS | retry 설정 0, 2, 99, -5를 검사해 실제 호출 1, 3, 3, 1회 확인 |
 | 공개 응답 비공개 경계 | PASS | FastAPI TestClient + FakeProvider로 question/hint 응답 확인 |
@@ -22,7 +22,7 @@
 ## 자동화 테스트에서 확인한 세부 사항
 
 - 질문 생성 출력에 `hints`, `question_type`, `example_sentence`가 섞이면 검증 실패.
-- `choices` 3개, `guidance` 2개 및 각 guidance의 `look_at`, `try_this`를 검사.
+- `choices` 1~3개, `guidance` 2개 및 각 guidance의 `look_at`, `try_this`를 검사.
 - 공개 `/api/question` 응답에는 `guidance` 배열과 `reference_answer`가 포함되지 않음.
 - 기존 `/api/hint`는 API 호환성을 유지하며 요청된 한 단계만 `look_at`, `try_this`, `level`로 반환. 전체 guidance 배열과 기준 답변은 반환하지 않음.
 - 비교 분석에서 `supplement`, `judgment_hold`는 빈 인용 허용. 나머지 세 분류는 비어 있거나 원문에 없는 인용이면 항목 검증에서 실패/제외.
